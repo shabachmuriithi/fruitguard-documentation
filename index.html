@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FruitGuard Technical Documentation</title>
+<link href="https://fonts.googleapis.com/css?family=Nunito&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="sidebar" aria-label="Main Documentation Navigation">
+  <h2>FruitGuard Documentation</h2>
+  <a href="#overview" class="active">Overview</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#hardware">Hardware</a>
+  <a href="#software">Software</a>
+  <a href="#communication">Communication</a>
+  <a href="#deployment">Deployment</a>
+  <a href="#usage">Usage</a>
+  <a href="#maintenance">Maintenance</a>
+  <a href="#security">Security</a>
+  <a href="#testing">Testing & Monitoring</a>
+  <a href="#future">Future</a>
+  <a href="#api">API Endpoints</a>
+</nav>
+
+        <main role="main">
+
+            <section id="overview" tabindex="-1">
+                <h1>FruitGuard Technical Documentation</h1>
+                <h2>1. Overview</h2>
+                    <p>FruitGuard targets pervasive crop loss caused by fruit fly infestations across smallholder farms, providing cost-effective and real-time trap monitoring. Farmers receive timely control alerts via SMS, empowering data-driven crop protection decisions.</p>
+                    <p>This system improves monitoring efficiency, eliminates manual trap inspections, and enables agricultural stakeholders to optimize pest management practices for sustainable productivity.</p>
+                <h3>Key Benefits:</h3>
+                <ul>
+                    <li>Real-time remote monitoring of trap fill levels.</li>
+                    <li>Automatic SMS alerts for maintenance triggers.</li>
+                    <li>Cloud-hosted data accessibility via web dashboard.</li>
+                    <li>Robust, low-power embedded IoT hardware.</li>
+                    <li>Secure and scalable backend infrastructure.</li>
+                </ul>
+            </section>
+
+            <section id="architecture" tabindex="-1">
+            <h2>2. System Architecture</h2>
+            <p>The FruitGuard system is designed across five tightly integrated layers:</p>
+                <ol>
+                    <li><strong>Hardware:</strong> IoT sensors (ultrasonic) connected to ESP32 microcontrollers capture environmental data.</li>
+                    <li><strong>Communication:</strong> Encrypted MQTT protocol transports telemetry securely to cloud broker.</li>
+                    <li><strong>Backend:</strong> Django REST services ingest, process, validate, and store telemetry data with alerting capabilities.</li>
+                    <li><strong>Alerting:</strong> Asynchronous SMS notifications trigger via SMS Leopard API upon threshold breach.</li>
+                    <li><strong>Frontend:</strong> React-based dashboard for real-time visualization and control.</li>
+                </ol>
+            <p>This modular architecture enables fault isolation, scalability, and straightforward extensibility.</p>
+            <img src="images/system.png" alt="FruitGuard System Architecture Diagram" style="max-width:100%; height:auto; margin-top:1rem; border: 1px solid #ccc; border-radius: 8px;"/>
+            </section>
+
+            <section id="hardware" tabindex="-1">
+               <h2>3. Hardware Details</h2>
+                 <p>Each FruitGuard device consists of:</p>
+                <ul>
+                    <li><strong>ESP32 MCU:</strong> Dual-core 240MHz, Wi-Fi enabled, handles sensing and comms.</li>
+                    <li><strong>Ultrasonic Sensor (HC-SR04):</strong> Measures trap fill distance with 3cm-4m accuracy.</li>
+                    <li><strong>Power Supply:</strong> Rechargeable battery and solar panel working together with voltage regulation to provide sustainable, reliable power.</li>
+                    <li><strong>Wiring & Enclosure:</strong> Weatherproof casing protects electronics, with careful wiring for sensor signal integrity.</li>
+                </ul>
+                <h3>Sample Wiring Connections:</h3>
+                <ul>
+                    <li>VCC - 5V</li>
+                    <li>GND - ESP32 ground</li>
+                    <li>Trig - GPIO5</li>
+                    <li>Echo - GPIO18 </li>
+                </ul>
+               <h3>Power Management Strategy:</h3>
+                <p>Firmware leverages deep sleep cycles between sensor readings to maximize battery life, waking periodically to take measurements and transmit data.</p>
+            </section>
+
+            <section id="software" tabindex="-1">
+                <h2>4. Software Design</h2>
+                <h3>ESP32 Firmware Flow</h3>
+                <p>The firmware continuously:</p>
+                <ol>
+                    <li>Initializes sensors and network connection.</li>
+                    <li>Measures ultrasonic echo time to derive distance.</li>
+                    <li>Constructs a JSON payload with sensor data and metadata (battery voltage, timestamp, device ID).</li>
+                    <li>Connects securely to MQTT broker over TLS to publish telemetry.</li>
+                    <li>Enters low-power sleep until the next measurement cycle.</li>
+                    <li>Handles disconnection/retries with exponential backoff.</li>
+                </ol>
+                <pre><code>// Simplified sensor read snippet
+                 long duration = pulseIn(echoPin, HIGH);
+                 float distance = (duration / 2.0) * 0.0343; // cm
+                </code></pre>
+                <h3>Backend API</h3>
+                <p>Implemented with Django REST Framework:</p>
+            <ul>
+                <li>Secured endpoints using JWT authentication.</li>
+                <li>Telemetry route validates and stores incoming JSON data.</li>
+                <li>Threshold checks trigger Celery tasks to send SMS alerts.</li>
+                <li>Device registration and metadata management endpoints.</li>
+            </ul>
+                <pre><code>CREATE TABLE devices (
+                device_id VARCHAR PRIMARY KEY,
+                device_identifier VARCHAR,
+                status VARCHAR,
+                user_id VARCHAR REFERENCES users(users_id) 
+                created_at TIMESTAMP,
+                updated_at TIMESTAMP
+                );
+
+                CREATE TABLE data_monitoring (
+                device_no VARCHAR REFERENCES devices(device_id),
+                trap_fill_level INT,
+                timestamp TIMESTAMP,
+                updated_at TIMESTAMP,
+                created at TIMESTAMP,
+                );
+                </code></pre>
+            <h3>SMS Alert Integration</h3>
+            <p>SMS Leopard REST API client supports:</p>
+            <ul>
+                <li>Basic Auth with Base64 encoded keys.</li>
+                <li>Retry with exponential backoff on failures.</li>
+                <li>Logging and alert history maintenance.</li>
+            </ul>
+            <h3>Frontend Application</h3>
+            <p>Developed in React/Next.js:</p>
+            <ul>
+                <li>Responsive dashboard visualizing trap metrics.</li>
+                <li>Role-based access control for users and admins.</li>
+                <li>Real-time data update logic with polling(future).</li>
+            </ul>
+            </section>
+
+        <section id="communication" tabindex="-1">
+        <h2>5. Communication Protocols</h2>
+        <h3>MQTT Topics & Quality-of-Service</h3>
+        <p>Standardized topic format:</p>
+        <code>fruitguard/devices/{device_id}/telemetry</code>
+        <p>QoS level 1 ensures message delivery without duplicates.</p>
+        <h3>Payload JSON Schema</h3>
+            <pre><code>{
+            "device_id": "FG123456",
+            "timestamp": "2025-10-01T12:45:00Z",
+            "distance_cm": 15.5,
+            }
+            </code></pre>
+        <h3>REST API Endpoint</h3>
+        <ul>
+            <li><code>POST /api/telemetry/</code> - accepts telemetry JSON with JWT Bearer token</li>
+            <li>Returns 200 OK on success, descriptive error codes on failure</li>
+        </ul>
+        <h3>Security Considerations</h3>
+        <ul>
+            <li>All communications secured with TLS (MQTT on port 8883, REST via HTTPS)</li>
+            <li>Environment variables used to store secrets and rotate keys regularly</li>
+            <li>Use of JWT tokens for stateless API authentication</li>
+        </ul>
+        </section>
+
+        <section id="deployment" tabindex="-1">
+        <h2>6. Installation & Deployment</h2>
+        <h3>Hardware Setup</h3>
+        <ol>
+            <li>Assemble ESP32 and sensors securely in enclosure.</li>
+            <li>Connect regulated power supply and battery.</li>
+            <li>Set sensor sensitivity and limits according to the specific design of the trap.</li>
+        </ol>
+        <h3>Firmware Production</h3>
+        <ol>
+            <li>Set MQTT credentials and broker URL in source.</li>
+            <li>Flash ESP32 using Arduino IDE.</li>
+            <li>Test connectivity and telemetry transmission.</li>
+        </ol>
+        <h3>Backend Deployment</h3>
+        <ol>
+            <li>Configure environment variables for DB, MQTT, SMS keys.</li>
+            <li>Run Django migrations and start API with Gunicorn.</li>
+            <li>Deploy backend on cloud platforms (Heroku) with HTTPS.</li>
+            </ol>
+        <h3>Frontend Deployment</h3>
+        <ol>
+            <li>Build the React app using <code>npm run build</code>.</li>
+            <li>Deploy static files on Vercel, Netlify, or CDN-enabled hosting.</li>
+            <li>Configure frontend env variables to point to backend APIs.</li>
+        </ol>
+        </section>
+
+        <section id="usage" tabindex="-1">
+        <h2>7. Usage Guide</h2>
+        <p><strong>Farmers:</strong> Monitor traps and receive SMS maintenance alerts to take action timely.</p>
+        <p><strong>Administrators:</strong> Manage users(agrovet and admin) and devices, verify system health, analyze aggregated data, and apply configuration changes.</p>
+        <h3>Dashboard Capabilities</h3>
+        <ul>
+            <li>Dashboard cards display key metrics: number of active agrovet users and active traps.</li>
+            <li>Profile section allows users to view and edit their personal information.</li>
+            <li>Real-time trap status overview with alerts and notifications for action.</li>
+        </ul>
+        </section>
+
+        <section id="maintenance" tabindex="-1">
+        <h2>8. Maintenance & Troubleshooting</h2>
+        <table>
+        <thead>
+        <tr><th>Issue</th><th>Cause</th><th>Recommended Fix</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>MQTT fails to connect</td>
+                <td>Incorrect credentials, network failure</td>
+                <td>Check MQTT settings, restart device, verify connectivity</td>
+            </tr>
+            <tr>
+                <td>Sensor readings always 0</td>
+                <td>Hardware fault or wiring issue</td>
+                <td>Inspect sensor wiring, replace sensor if defective</td>
+            </tr>
+            <tr>
+                <td>No SMS alerts</td>
+                <td>Invalid API key or message formatting error</td>
+                <td>Validate API credentials, verify message formats and phone numbers</td>
+            </tr>
+            <tr>
+                <td>API 401 Unauthorized</td>
+                <td>Expired or missing JWT token</td>
+                <td>Refresh token or reauthenticate client</td>
+            </tr>
+            <tr>
+                <td>Dashboard data delayed or stale</td>
+                <td>Backend or frontend sync issues</td>
+                <td>Restart backend services, refresh frontend, check network logs</td>
+            </tr>
+        </tbody>
+        </table>
+        <h3>Recommended Maintenance</h3>
+        <ul>
+        <li>Regular sensor calibration.</li>
+        <li>Periodic firmware updates.</li>
+        <li>Monitor logs and alert history for anomalies.</li>
+        <li>Backup device and user data periodically.</li>
+        </ul>
+        </section>
+
+        <section id="security" tabindex="-1">
+        <h2>9. Security Considerations</h2>
+        <ul>
+        <li><strong>Authentication: </strong>JWT-based token authentication for APIs and devices.</li>
+        <li><strong>Encryption: </strong>TLS 1.2+ for MQTT and HTTPS for all web requests.</li>
+        <li><strong>Access Control: </strong>Role-based permissions for farmers, admins, and devices.</li>
+        <li><strong>Input Validation: </strong>Strict server-side input sanitization to prevent injection attacks.</li>
+        <li><strong>Audit Logging: </strong>All access and error logs recorded for security audit.</li>
+        </ul>
+        </section>
+
+        <section id="testing" tabindex="-1">
+        <h2>10. Testing and Monitoring</h2>
+        <ul>
+        <li>Unit tests covering backend API, firmware sensor logic, and frontend components.</li>
+        <li>Integration tests with simulated MQTT data streams and API workflows.</li>
+        <li>Monitoring tools like Prometheus for system health, Sentry for error tracking.</li>
+        <li>Success metrics tracking include uptime, data completeness, and alert delivery.</li>
+        <li>Postman collections automate API contract testing.</li>
+        </ul>
+        </section>
+
+        <section id="future" tabindex="-1">
+        <h2>11. Future Enhancements</h2>
+        <ul>
+        <li><strong>Predictive analytics:</strong> AI-driven emissions and trap fill trend prediction.</li>
+        <li><strong>LoRaWAN:</strong> IoT network expansion for wide-area deployments.</li>
+        <li><strong>Mobile app:</strong> Native Android/iOS app with push notifications and offline mode.</li>
+        <li><strong>Multilingual support:</strong> Localization of UI and SMS alerts.</li>
+        <li><strong>Additional sensors:</strong> Environmental sensors for humidity, temperature, soil composition.</li>
+        </ul>
+
+        </section>
+
+        <section id="api" tabindex="-1">
+        <h2>12. API Endpoints</h2>
+
+        <h3>Data Monitoring API</h3>
+        <p><a href="#" target="_blank">http://127.0.0.1:8000/api/data_monitoring/</a></p>
+        <p>Telemetry data ingestion and querying endpoint.</p>
+        <pre><code>
+            {
+                "trap_fill_level": 0,
+                "updated_at": "2025-09-12T19:18:29.240879Z",
+                "created_at": "2025-09-12T19:18:29.240907Z",
+                "device": 5
+                
+            }
+        </code></pre>
+
+        <h3>Device API</h3>
+        <p><a href="#" target="_blank">http://127.0.0.1:8000/api/device/</a></p>
+        <p>CRUD devices registered in system.</p>
+        <pre><code>
+            {
+                "device_id": 5,
+                "device_identifier": "ESP32-000000000000",
+                "status": "Active",
+                "created_at": "2025-09-11",
+                "user_id": 1
+            }
+        </code></pre>
+
+        <h3>Users API</h3>
+        <p><a href="#" target="_blank">http://127.0.0.1:8000/api/users/</a></p>
+        <p>User account management.</p>
+        <pre><code>
+            {
+                "id": 1,
+                "first_name": "Mariana",
+                "last_name": "Nyambura",
+                "phone_number": "0716088246",
+                "email": "esthenyambua@gmail.com",
+                "profile_image": null,
+                "location": null,
+                "number_of_traps": null,
+                "user_type": "agrovet",
+                "created_at": "2025-09-11T05:07:46.944957Z"
+            }
+        </code></pre>
+        </section>
+
+        </main>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sections = document.querySelectorAll('section[id]');
+    const links = document.querySelectorAll('.sidebar a');
+
+    function highlightCurrentSection() {
+      const scrollPos = window.scrollY + window.innerHeight / 4;
+      let currentId = '';
+      sections.forEach(section => {
+        if (scrollPos >= section.offsetTop) {
+          currentId = section.getAttribute('id');
+        }
+      });
+      links.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').substring(1) === currentId) {
+          link.classList.add('active');
+        }
+      });
+    }
+    window.addEventListener('scroll', highlightCurrentSection);
+    highlightCurrentSection();
+  });
+</script>
+
+</body>
+</html>
