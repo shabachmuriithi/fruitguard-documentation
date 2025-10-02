@@ -9,24 +9,25 @@
 </head>
 <body>
         <nav class="sidebar" aria-label="Main Documentation Navigation">
-            <h2>FruitGuard Documentation</h2>
-            <a href="#overview" class="active">Overview</a>
-            <a href="#architecture">Architecture</a>
-            <a href="#hardware">Hardware</a>
-            <a href="#software">Software</a>
-            <a href="#communication">Communication</a>
-            <a href="#deployment">Deployment</a>
-            <a href="#usage">Usage</a>
-            <a href="#maintenance">Maintenance</a>
-            <a href="#security">Security</a>
-            <a href="#testing">Testing & Monitoring</a>
-            <a href="#future">Future</a>
-            <a href="#api">API Endpoints</a>
+            <img src="images/fruitguardlogo.png" alt="logo" id="fruitguardlogo"/>
+            <h2 >FruitGuard Documentation</h2>
+                <a href="#overview" class="active">Overview</a>
+                <a href="#architecture">Architecture</a>
+                <a href="#hardware">Hardware</a>
+                <a href="#software">Software</a>
+                <a href="#communication">Communication</a>
+                <a href="#deployment">Deployment</a>
+                <a href="#usage">Usage</a>
+                <a href="#maintenance">Maintenance</a>
+                <a href="#security">Security</a>
+                <a href="#testing">Testing & Monitoring</a>
+                <a href="#future">Future</a>
+                <a href="#api">API Endpoints</a>
         </nav>
 
     <main role="main">
     <section id="overview" tabindex="-1">
-    <h1>FruitGuard Technical Documentation</h1>
+    <h1 id="heading">FruitGuard Technical Documentation</h1>
     <h2>1. Overview</h2>
     <p>FruitGuard targets pervasive crop loss caused by fruit fly infestations across smallholder farms, providing cost-effective and real-time trap monitoring. Farmers receive timely control alerts via SMS, empowering data-driven crop protection decisions.</p>
     <p>This system improves monitoring efficiency, eliminates manual trap inspections, and enables agricultural stakeholders to optimize pest management practices for sustainable productivity.</p>
@@ -279,25 +280,29 @@
     <h3>Data Monitoring API</h3>
     <p><a href="#" target="_blank">http://127.0.0.1:8000/api/data_monitoring/</a></p>
     <p>Telemetry data ingestion and querying endpoint.</p>
-    <pre><code>{
+    <pre>
+        <code>{
         "trap_fill_level": 0,
         "updated_at": "2025-09-12T19:18:29.240879Z",
         "created_at": "2025-09-12T19:18:29.240907Z",
         "device": 5
         }
-    </code></pre>
+        </code>
+    </pre>
 
     <h3>Device API</h3>
     <p><a href="#" target="_blank">http://127.0.0.1:8000/api/device/</a></p>
     <p>CRUD devices registered in system.</p>
-    <pre><code>{
+    <pre>
+        <code>{
         "device_id": 5,
         "device_identifier": "ESP32-000000000000",
         "status": "Active",
         "created_at": "2025-09-11",
         "user_id": 1
         }
-    </code></pre>
+        </code>
+    </pre>
 
     <h3>Users API</h3>
     <p><a href="#" target="_blank">http://127.0.0.1:8000/api/users/</a></p>
@@ -319,41 +324,41 @@
     </main>
 
     <footer class="footer">
-    &copy; 2025 FruitGuard. All rights reserved.  
+        &copy; 2025 FruitGuard. All rights reserved.  
         <a href="mailto:support@fruitguard.com">Contact Support</a> | 
         <a href="https://fruitguard.com/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
     </footer>
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-    const sections = document.querySelectorAll('section[id]');
-    const links = document.querySelectorAll('.sidebar a');
+        document.addEventListener('DOMContentLoaded', () => {
+        const sections = document.querySelectorAll('section[id]');
+        const links = document.querySelectorAll('.sidebar a');
 
-    function highlightCurrentSection() {
-        const scrollPos = window.scrollY + window.innerHeight / 2;
-        let currentId = null;
+        function highlightCurrentSection() {
+            const scrollPos = window.scrollY + window.innerHeight / 2;
+            let currentId = null;
 
-        sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionBottom = sectionTop + section.offsetHeight;
+            sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionBottom = sectionTop + section.offsetHeight;
 
-        if(scrollPos >= sectionTop && scrollPos < sectionBottom) {
-            currentId = section.getAttribute('id');
+            if(scrollPos >= sectionTop && scrollPos < sectionBottom) {
+                currentId = section.getAttribute('id');
+            }
+            });
+
+            links.forEach(link => {
+            if(link.getAttribute('href').substring(1) === currentId) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+            });
         }
-        });
 
-        links.forEach(link => {
-        if(link.getAttribute('href').substring(1) === currentId) {
-            link.classList.add('active');
-        } else {
-            link.classList.remove('active');
-        }
+        window.addEventListener('scroll', highlightCurrentSection);
+        highlightCurrentSection();
         });
-    }
-
-    window.addEventListener('scroll', highlightCurrentSection);
-    highlightCurrentSection();
-    });
     </script>
 
 </body>

@@ -12,7 +12,6 @@
   .sidebar {
     width: 260px;
     background-color: #683929;
-    padding: 2rem 1.5rem ;
     box-shadow: 2px 0 6px rgba(104, 57, 41, 0.3);
     overflow-y: auto;
     position: fixed;
@@ -20,6 +19,10 @@
     top: 0;
     left: 0;
     color: #FFC661;
+  }
+  #heading{
+    margin-bottom: 50px;
+    font-size: 30px;
   }
   .sidebar h2 {
     font-weight: 700;
@@ -31,12 +34,13 @@
   .sidebar a {
     display: block;
     color: #FFC661;
-    padding: 0.6rem 0.8rem;
+    padding: 0.5rem 0.8rem;
     border-radius: 6px;
     font-weight: 600;
     font-size: 1rem;
-    margin-bottom: 0.6rem;
+    margin-bottom: 1rem;
     transition: background-color 0.3s ease, color 0.3s ease;
+    margin-left: 1rem;
   }
   .sidebar a:hover, .sidebar a.active {
     background-color: #FFC661;
@@ -64,6 +68,7 @@
     border-bottom: 3px solid #FFC661;
     padding-bottom: 0.3rem;
     font-weight: 700;
+    margin-top: -30px;
   }
   h3 {
     color: #9a5a25;
@@ -111,6 +116,14 @@
   html {
     scroll-behavior: smooth;
   }
+  #fruitguardlogo{
+    margin-left: 2rem;
+    margin-top: 1rem;
+  }
+  .sidebar-links{
+    margin-top: 30px;
+    margin-left: 20px;
+  }
   .footer {
     background-color: #683929;
     color:white;
@@ -135,11 +148,10 @@
       width: 100%;
       height: auto;
       box-shadow: none;
-      padding: 1rem 1.5rem 1.5rem 1.5rem;
       display: flex;
       overflow-x: auto;
       white-space: nowrap;
-      margin-bottom: 1rem;
+      margin-bottom:-2rem;
     }
     .sidebar h2 {
       display: none;
