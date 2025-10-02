@@ -1,21 +1,24 @@
-  *, *::before, *::after { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; }
   body {
     font-family: 'Nunito', sans-serif;
     margin: 0;
     display: flex;
-    height: 100vh;
-    color: #3a2f2f;
+    flex-direction: column;
+    min-height: 100vh;
     background-color: #fff7e6;
+    color: #3a2f2f;
   }
   a { text-decoration: none; }
   .sidebar {
     width: 260px;
     background-color: #683929;
-    padding: 2rem 1.5rem;
+    padding: 2rem 1.5rem ;
     box-shadow: 2px 0 6px rgba(104, 57, 41, 0.3);
     overflow-y: auto;
     position: fixed;
-    height: 100%;
+    height:100vh;
+    top: 0;
+    left: 0;
     color: #FFC661;
   }
   .sidebar h2 {
@@ -35,17 +38,16 @@
     margin-bottom: 0.6rem;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
-  .sidebar a:hover,
-  .sidebar a.active {
+  .sidebar a:hover, .sidebar a.active {
     background-color: #FFC661;
     color: #683929;
   }
   main {
     margin-left: 260px;
     padding: 3rem 3.5rem;
-    overflow-y: auto;
-    height: 100vh;
     background-color: #fff7e6;
+    flex: 1 0 auto;
+    overflow-y: auto;
   }
   section {
     margin-bottom: 3.5rem;
@@ -56,6 +58,7 @@
   h1 {
     font-weight: 800;
     margin-bottom: 1rem;
+    
   }
   h2 {
     border-bottom: 3px solid #FFC661;
@@ -108,6 +111,20 @@
   html {
     scroll-behavior: smooth;
   }
+  .footer {
+    background-color: #683929;
+    color:white;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .footer a {
+    color: #FFC661;
+    text-decoration: underline;
+    margin: 0 0.5rem;
+  }
   @media (max-width: 820px) {
     body {
       flex-direction: column;
@@ -122,6 +139,7 @@
       display: flex;
       overflow-x: auto;
       white-space: nowrap;
+      margin-bottom: 1rem;
     }
     .sidebar h2 {
       display: none;
