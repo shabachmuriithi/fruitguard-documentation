@@ -6,6 +6,7 @@
 <title>FruitGuard Technical Documentation</title>
 <link href="https://fonts.googleapis.com/css?family=Nunito&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script src="script.js"></script>
 </head>
 <body>
         <nav class="sidebar" aria-label="Main Documentation Navigation">
@@ -23,6 +24,9 @@
                 <a href="#testing">Testing & Monitoring</a>
                 <a href="#future">Future</a>
                 <a href="#api">API Endpoints</a>
+                <a href="#best-practices">Best Practices & Standards</a>
+                <a href="#deployment-ci-cd">Deployment & CI/CD</a>
+                <a href="#api">API Documentation</a>
         </nav>
 
     <main role="main">
@@ -31,7 +35,7 @@
     <h2>1. Overview</h2>
     <p>FruitGuard targets pervasive crop loss caused by fruit fly infestations across smallholder farms, providing cost-effective and real-time trap monitoring. Farmers receive timely control alerts via SMS, empowering data-driven crop protection decisions.</p>
     <p>This system improves monitoring efficiency, eliminates manual trap inspections, and enables agricultural stakeholders to optimize pest management practices for sustainable productivity.</p>
-    <h3>Key Benefits:</h3>
+    <h3>Key benefits:</h3>
     <ul>
         <li>Real-time remote monitoring of trap fill levels.</li>
         <li>Automatic SMS alerts for maintenance triggers.</li>
@@ -56,7 +60,7 @@
     </section>
 
     <section id="hardware" tabindex="-1">
-    <h2>3. Hardware Details</h2>
+    <h2>3. Hardware details</h2>
     <p>Each FruitGuard device consists of:</p>
     <ul>
         <li><strong>ESP32 MCU:</strong> Dual-core 240MHz, Wi-Fi enabled, handles sensing and comms.</li>
@@ -64,20 +68,20 @@
         <li><strong>Power Supply:</strong> Rechargeable battery and solar panel working together with voltage regulation to provide sustainable, reliable power.</li>
         <li><strong>Wiring & Enclosure:</strong> Weatherproof casing protects electronics, with careful wiring for sensor signal integrity.</li>
     </ul>
-    <h3>Sample Wiring Connections:</h3>
+    <h3>Sample wiring connections:</h3>
     <ul>
         <li>VCC - 5V</li>
         <li>GND - ESP32 ground</li>
         <li>Trig - GPIO5</li>
         <li>Echo - GPIO18 </li>
     </ul>
-    <h3>Power Management Strategy:</h3>
+    <h3>Power management strategy:</h3>
     <p>Firmware leverages deep sleep cycles between sensor readings to maximize battery life, waking periodically to take measurements and transmit data.</p>
     </section>
 
     <section id="software" tabindex="-1">
-    <h2>4. Software Design</h2>
-    <h3>ESP32 Firmware Flow</h3>
+    <h2>4. Software design</h2>
+    <h3>ESP32 firmware flow</h3>
     <p>The firmware continuously:</p>
     <ol>
         <li>Initializes sensors and network connection.</li>
@@ -116,14 +120,14 @@
         created_at TIMESTAMP
         );
     </code></pre>
-    <h3>SMS Alert Integration</h3>
+    <h3>SMS Alert integration</h3>
     <p>SMS Leopard REST API client supports:</p>
     <ul>
         <li>Basic Auth with Base64 encoded keys.</li>
         <li>Retry with exponential backoff on failures.</li>
         <li>Logging and alert history maintenance.</li>
     </ul>
-    <h3>Frontend Application</h3>
+    <h3>Frontend application</h3>
     <p>Developed in React/Next.js:</p>
     <ul>
         <li>Responsive dashboard visualizing trap metrics.</li>
@@ -133,7 +137,7 @@
     </section>
 
     <section id="communication" tabindex="-1">
-    <h2>5. Communication Protocols</h2>
+    <h2>5. Communication protocols</h2>
     <h3>MQTT Topics & Quality-of-Service</h3>
     <p>Standardized topic format:</p>
     <code>fruitguard/devices/{device_id}/telemetry</code>
@@ -145,12 +149,12 @@
         "distance_cm": 15.5,
         }
     </code></pre>
-    <h3>REST API Endpoint</h3>
+    <h3>REST API endpoint</h3>
     <ul>
         <li><code>POST /api/telemetry/</code> - accepts telemetry JSON with JWT Bearer token</li>
         <li>Returns 200 OK on success, descriptive error codes on failure</li>
     </ul>
-    <h3>Security Considerations</h3>
+    <h3>Security considerations</h3>
     <ul>
         <li>All communications secured with TLS (MQTT on port 8883, REST via HTTPS)</li>
         <li>Environment variables used to store secrets and rotate keys regularly</li>
@@ -160,25 +164,25 @@
 
     <section id="deployment" tabindex="-1">
     <h2>6. Installation & Deployment</h2>
-    <h3>Hardware Setup</h3>
+    <h3>Hardware setup</h3>
     <ol>
         <li>Assemble ESP32 and sensors securely in enclosure.</li>
         <li>Connect regulated power supply and battery.</li>
         <li>Set sensor sensitivity and limits according to the specific design of the trap.</li>
     </ol>
-    <h3>Firmware Production</h3>
+    <h3>Firmware production</h3>
     <ol>
         <li>Set MQTT credentials and broker URL in source.</li>
         <li>Flash ESP32 using Arduino IDE.</li>
         <li>Test connectivity and telemetry transmission.</li>
     </ol>
-    <h3>Backend Deployment</h3>
+    <h3>Backend deployment</h3>
     <ol>
         <li>Configure environment variables for DB, MQTT, SMS keys.</li>
         <li>Run Django migrations and start API with Gunicorn.</li>
         <li>Deploy backend on cloud platforms (Heroku) with HTTPS.</li>
     </ol>
-    <h3>Frontend Deployment</h3>
+    <h3>Frontend deployment</h3>
     <ol>
         <li>Build the React app using <code>npm run build</code>.</li>
         <li>Deploy static files on Vercel, Netlify, or CDN-enabled hosting.</li>
@@ -187,10 +191,10 @@
     </section>
 
     <section id="usage" tabindex="-1">
-    <h2>7. Usage Guide</h2>
+    <h2>7. Usage guide</h2>
     <p><strong>Farmers:</strong> Monitor traps and receive SMS maintenance alerts to take action timely.</p>
     <p><strong>Administrators:</strong> Manage users(agrovet and admin) and devices, verify system health, analyze aggregated data, and apply configuration changes.</p>
-    <h3>Dashboard Capabilities</h3>
+    <h3>Dashboard capabilities</h3>
     <ul>
         <li>Dashboard cards display key metrics: number of active agrovet users and active traps.</li>
         <li>Profile section allows users to view and edit their personal information.</li>
@@ -202,7 +206,7 @@
     <h2>8. Maintenance & Troubleshooting</h2>
     <table>
         <thead>
-        <tr><th>Issue</th><th>Cause</th><th>Recommended Fix</th></tr>
+        <tr><th>Issue</th><th>Cause</th><th>Recommended fix</th></tr>
         </thead>
         <tbody>
         <tr>
@@ -226,15 +230,15 @@
             <td>Refresh token or reauthenticate client</td>
         </tr>
         <tr>
-            <td>Dashboard data delayed or stale</td>
+            <td>Dashboard data delayed</td>
             <td>Backend or frontend sync issues</td>
             <td>Restart backend services, refresh frontend, check network logs</td>
         </tr>
         </tbody>
     </table>
-    <h3>Recommended Maintenance</h3>
+    <h3>Recommended maintenance</h3>
     <ul>
-        <li>Regular sensor calibration.</li>
+        <li>Checking and adjusting the sensor regularly to make sure it gives correct and accurate measurements."</li>
         <li>Periodic firmware updates.</li>
         <li>Monitor logs and alert history for anomalies.</li>
         <li>Backup device and user data periodically.</li>
@@ -242,7 +246,7 @@
     </section>
 
     <section id="security" tabindex="-1">
-    <h2>9. Security Considerations</h2>
+    <h2>9. Security considerations</h2>
     <ul>
         <li><strong>Authentication: </strong>JWT-based token authentication for APIs and devices.</li>
         <li><strong>Encryption: </strong>TLS 1.2+ for MQTT and HTTPS for all web requests.</li>
@@ -253,32 +257,30 @@
     </section>
 
     <section id="testing" tabindex="-1">
-    <h2>10. Testing and Monitoring</h2>
+    <h2>10. Testing and monitoring</h2>
     <ul>
         <li>Unit tests covering backend API, firmware sensor logic, and frontend components.</li>
         <li>Integration tests with simulated MQTT data streams and API workflows.</li>
-        <li>Monitoring tools like Prometheus for system health, Sentry for error tracking.</li>
+        <li>Monitoring tools for system health, Sentry for error tracking.</li>
         <li>Success metrics tracking include uptime, data completeness, and alert delivery.</li>
         <li>Postman collections automate API contract testing.</li>
     </ul>
     </section>
 
     <section id="future" tabindex="-1">
-    <h2>11. Future Enhancements</h2>
+    <h2>11. Future enhancements</h2>
     <ul>
-        <li><strong>Predictive analytics:</strong> AI-driven emissions and trap fill trend prediction.</li>
+        <li><strong>Predictive analytics:</strong> AI-driven trap fill trend prediction.</li>
         <li><strong>LoRaWAN:</strong> IoT network expansion for wide-area deployments.</li>
-        <li><strong>Mobile app:</strong> Native Android/iOS app with push notifications and offline mode.</li>
-        <li><strong>Multilingual support:</strong> Localization of UI and SMS alerts.</li>
-        <li><strong>Additional sensors:</strong> Environmental sensors for humidity, temperature, soil composition.</li>
+        <li><strong>Additional sensors:</strong> Environmental sensors for humidity, temperature.</li>
     </ul>
     </section>
 
     <section id="api" tabindex="-1">
-    <h2>12. API Endpoints</h2>
+    <h2>12. API endpoints</h2>
 
     <h3>Data Monitoring API</h3>
-    <p><a href="#" target="_blank">http://127.0.0.1:8000/api/data_monitoring/</a></p>
+    <p><a href="#" target="_blank">https://fruitguard-3b97d3adfdf5.herokuapp.com/api/data_monitoring/</a></p>
     <p>Telemetry data ingestion and querying endpoint.</p>
     <pre>
         <code>{
@@ -291,12 +293,12 @@
     </pre>
 
     <h3>Device API</h3>
-    <p><a href="#" target="_blank">http://127.0.0.1:8000/api/device/</a></p>
+    <p><a href="#" target="_blank">https://fruitguard-3b97d3adfdf5.herokuapp.com/api/device/</a></p>
     <p>CRUD devices registered in system.</p>
     <pre>
         <code>{
         "device_id": 5,
-        "device_identifier": "ESP32-000000000000",
+        "device_identifier": "ESP32-000000000001",
         "status": "Active",
         "created_at": "2025-09-11",
         "user_id": 1
@@ -305,7 +307,7 @@
     </pre>
 
     <h3>Users API</h3>
-    <p><a href="#" target="_blank">http://127.0.0.1:8000/api/users/</a></p>
+    <p><a href="#" target="_blank">https://fruitguard-3b97d3adfdf5.herokuapp.com/api/users/</a></p>
     <p>User account management.</p>
     <pre><code>{
         "id": 1,
@@ -321,45 +323,63 @@
         }
     </code></pre>
     </section>
+    <section id="best-practices" tabindex="-1">
+  <h2>13. Best practices and standards</h2>
+  <h3>Coding conventions</h3>
+  <ul>
+    <li><strong>Frontend:</strong> Use React functional components, apply TypeScript for type safety, and Tailwind CSS for styling.</li>
+    <li><strong>Backend:</strong> Follow Django REST Framework standards with snake_case for variables and PascalCase for models.</li>
+  </ul>
+  <h3>Testing tools</h3>
+  <ul>
+    <li>Frontend: Jest and React Testing Library for unit and integration tests.</li>
+    <li>Backend: Django test framework with <code>python manage.py test</code>.</li>
+  </ul>
+  <h3>Linting and code quality</h3>
+  <ul>
+    <li>Use ESLint and Prettier for frontend code consistency.</li>
+    <li>Use flake8 and black for Python backend code formatting.</li>
+  </ul>
+  <h3>CI/CD process</h3>
+  <ul>
+    <li>Automatic testing, linting, and builds triggered on every Pull Request via GitHub Actions.</li>
+    <li>Merge only after passing tests and code review approvals.</li>
+  </ul>
+</section>
+
+<section id="deployment-ci-cd" tabindex="-1">
+  <h2>14. Deployment and CI/CD</h2>
+  <h3>Deployment platforms</h3>
+  <ul>
+    <li>Frontend hosted on Vercel, supporting instant CI/CD with GitHub integration.</li>
+    <li>Backend deployed on Heroku with environment variables configured securely.</li>
+  </ul>
+  <h3>Environment configuration</h3>
+  <ul>
+    <li>Manage sensitive tokens and API keys securely via environment variables.</li>
+  </ul>
+  <h3>Automated pipelines</h3>
+  <ul>
+    <li>Use GitHub Actions to run tests and build projects automatically on push/PR.</li>
+    <li>Deploy automatically on successful merges to main branches.</li>
+  </ul>
+</section>
+
+<section id="api" tabindex="-1">
+  <h2>15. API documentation links</h2>
+  <p>Access comprehensive and interactive API documentation to facilitate integration and development:</p>
+  <ul>
+    <li><a href="https://fruitguard-3b97d3adfdf5.herokuapp.com/api/schema/swagger-ui/" target="_blank" rel="noopener">Swagger UI</a> - Interactive API explorer.</li>
+    <li><a href="https://fruitguard-3b97d3adfdf5.herokuapp.com/api/schema/redoc/" target="_blank" rel="noopener">ReDoc</a> - Clean, responsive API docs.</li>
+  </ul>
+</section>
     </main>
 
     <footer class="footer">
         &copy; 2025 FruitGuard. All rights reserved.  
         <a href="mailto:support@fruitguard.com">Contact Support</a> | 
-        <a href="https://fruitguard.com/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+        <a href="https://fruitguard.com/privacy-policy" target="_blank" rel="no referrer">Privacy Policy</a>
     </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-        const sections = document.querySelectorAll('section[id]');
-        const links = document.querySelectorAll('.sidebar a');
-
-        function highlightCurrentSection() {
-            const scrollPos = window.scrollY + window.innerHeight / 2;
-            let currentId = null;
-
-            sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionBottom = sectionTop + section.offsetHeight;
-
-            if(scrollPos >= sectionTop && scrollPos < sectionBottom) {
-                currentId = section.getAttribute('id');
-            }
-            });
-
-            links.forEach(link => {
-            if(link.getAttribute('href').substring(1) === currentId) {
-                link.classList.add('active');
-            } else {
-                link.classList.remove('active');
-            }
-            });
-        }
-
-        window.addEventListener('scroll', highlightCurrentSection);
-        highlightCurrentSection();
-        });
-    </script>
 
 </body>
 </html>
