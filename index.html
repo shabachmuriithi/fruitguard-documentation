@@ -31,10 +31,9 @@
       <a href="#security">Security</a>
       <a href="#testing">Testing & Monitoring</a>
       <a href="#future">Future</a>
-      <a href="#api">API Endpoints</a>
+      <a href="#api">API</a>
       <a href="#best-practices">Best Practices & Standards</a>
       <a href="#deployment-ci-cd">Deployment & CI/CD</a>
-      <a href="#api">API Documentation</a>
     </nav>
 
     <main role="main" class="main">
@@ -138,7 +137,7 @@
       </section>
 
       <section id="systemflow" tabindex="-1">
-        <h2>2. System Flow</h2>
+        <h2>3. System Flow</h2>
         <h3>User Flow</h3>
         <p>
           <a
@@ -178,7 +177,7 @@
       </section>
 
       <section id="architecture" tabindex="-1">
-        <h2>3. System Architecture</h2>
+        <h2>4. System Architecture</h2>
         <p>
           The FruitGuard system is designed across five tightly integrated
           layers:
@@ -227,7 +226,7 @@
       </section>
 
       <section id="database" tabindex="-1">
-        <h2>4. Database</h2>
+        <h2>5. Database</h2>
         <h3>Type</h3>
         <p>PostgreSQL</p>
         <h3>Schema</h3>
@@ -259,33 +258,43 @@
       </section>
 
       <section id="hardware" tabindex="-1">
-        <h2>5. Hardware details</h2>
+        <h2>6. Hardware details</h2>
         <p>Each FruitGuard device consists of:</p>
+        <h3>Hardware Components</h3>
         <ul>
           <li>
-            <strong>ESP32 MCU:</strong> Dual-core 240MHz, Wi-Fi enabled, handles
-            sensing and comms.
-          </li>
+             <strong>ESP32 MCU:</strong> </li>
+             <p> Dual-core MCU, featuring integrated Wi-Fi and Bluetooth capabilities. It serves as the central processing unit for the FruitGuard device.<br>
+                 Handles data acquisition from sensors, processes measurements, and manages communication with external systems</p>
           <li>
-            <strong>Ultrasonic Sensor (HC-SR04):</strong> Measures trap fill
-            distance with 3cm-4m accuracy.
+            <strong>Ultrasonic Sensor (HC-SR04):</strong> 
           </li>
+          <p> A low-cost ultrasonic sensor capable of measuring distances from 2 cm to 4 meters with an accuracy of ±2 mm <br>
+            Calculates the distance to the fill level inside a fruit fly trap.<br> The sensor uses a trigger pin to initiate measurement and an echo pin to return the result.</p>
           <li>
-            <strong>Power Supply:</strong> Rechargeable battery and solar panel
+            <strong>Power Supply:</strong> 
+          </li>
+          <p>Rechargeable battery and solar panel
             working together with voltage regulation to provide sustainable,
-            reliable power.
-          </li>
+            reliable power.</p>
           <li>
-            <strong>Wiring & Enclosure:</strong> Weatherproof casing protects
-            electronics, with careful wiring for sensor signal integrity.
+            <strong>Wiring & Enclosure:</strong> 
           </li>
+          <p>Protects the system from environmental hazards and ensures reliable operation by maintaining robust electrical connections</p>
+          <li><strong>LoRa module:</strong></li>
+          <p>A low-power, long-range radio module <br>
+            Enables long-distance, low-bandwidth communication for transmitting sensor data to a central gateway </p>
         </ul>
-        <h3>Sample wiring connections:</h3>
+        <h3>Wiring connections:</h3>
         <ul>
-          <li>VCC - 5V</li>
-          <li>GND - ESP32 ground</li>
-          <li>Trig - GPIO5</li>
-          <li>Echo - GPIO18</li>
+          <li> <strong>VCC - 5V</strong></li>
+          <p>The HC-SR04 VCC pin is connected to a 5V power source from the ESP32 providing the necessary power for the sensor</p>
+          <li><strong>GND - ESP32 ground</strong></li>
+          <p>The sensor’s ground pin is connected to the ESP32’s ground pin to complete the electrical circuit</p>
+          <li><strong>Trig - GPIO5</strong></li>
+          <p> The trigger pin of the HC-SR04 is connected to GPIO5 on the ESP32. The ESP32 sends a short pulse to this pin to initiate an ultrasonic measurement</p>
+          <li><strong>Echo - GPIO18</strong></li>
+          <p> The echo pin is connected to GPIO18 on the ESP32. This pin outputs a pulse whose duration corresponds to the time taken for the ultrasonic wave to return, which the ESP32 uses to calculate distance</p>
         </ul>
         <h3>Power management strategy:</h3>
         <p>
@@ -296,7 +305,7 @@
       </section>
 
       <section id="software" tabindex="-1">
-        <h2>6. Software design</h2>
+        <h2>7. Software design</h2>
         <h3>ESP32 firmware flow</h3>
         <p>The firmware continuously:</p>
         <ol>
@@ -358,7 +367,7 @@
       </section>
 
       <section id="communication" tabindex="-1">
-        <h2>7. Communication protocols</h2>
+        <h2>8. Communication protocols</h2>
         <h3>MQTT Topics & Quality-of-Service</h3>
         <p>Standardized topic format:</p>
         <code>fruitguard/devices/{device_id}/telemetry</code>
@@ -393,7 +402,7 @@
       </section>
 
       <section id="deployment" tabindex="-1">
-        <h2>8. Installation & Deployment</h2>
+        <h2>9. Installation & Deployment</h2>
         <h3>Hardware setup</h3>
         <ol>
           <li>Assemble ESP32 and sensors securely in enclosure.</li>
@@ -426,7 +435,7 @@
       </section>
 
       <section id="usage" tabindex="-1">
-        <h2>9. Usage guide</h2>
+        <h2>10. Usage guide</h2>
         <p>
           <strong>Farmers:</strong> Monitor traps and receive SMS maintenance
           alerts to take action timely.
@@ -454,7 +463,7 @@
       </section>
 
       <section id="maintenance" tabindex="-1">
-        <h2>10. Maintenance & Troubleshooting</h2>
+        <h2>11. Maintenance & Troubleshooting</h2>
         <table>
           <thead>
             <tr>
@@ -509,7 +518,7 @@
       </section>
 
       <section id="security" tabindex="-1">
-        <h2>11. Security considerations</h2>
+        <h2>12. Security considerations</h2>
         <ul>
           <li>
             <strong>Authentication: </strong>JWT-based token authentication for
@@ -535,7 +544,7 @@
       </section>
 
       <section id="testing" tabindex="-1">
-        <h2>12. Testing and monitoring</h2>
+        <h2>13. Testing and monitoring</h2>
         <ul>
           <li>
             Unit tests covering backend API, firmware sensor logic, and frontend
@@ -557,7 +566,7 @@
       </section>
 
       <section id="future" tabindex="-1">
-        <h2>13. Future enhancements</h2>
+        <h2>14. Future enhancements</h2>
         <ul>
           <li>
             <strong>Predictive analytics:</strong> AI-driven trap fill trend
@@ -575,7 +584,7 @@
       </section>
 
       <section id="api" tabindex="-1">
-        <h2>14. API endpoints</h2>
+        <h2>15. API</h2>
 
         <h3>Data Monitoring API</h3>
         <p>
@@ -632,9 +641,34 @@
         "created_at": "2025-09-11T05:07:46.944957Z"
         }
     </code></pre>
+    <h3>API documentation links</h3>
+        <p>
+          Access comprehensive and interactive API documentation to facilitate
+          integration and development:
+        </p>
+        <ul>
+          <li>
+            <a
+              href="https://fruitguard-3b97d3adfdf5.herokuapp.com/api/schema/swagger-ui/"
+              target="_blank"
+              rel="noopener"
+              >Swagger UI</a
+            >
+            - Interactive API explorer.
+          </li>
+          <li>
+            <a
+              href="https://fruitguard-3b97d3adfdf5.herokuapp.com/api/schema/redoc/"
+              target="_blank"
+              rel="noopener"
+              >ReDoc</a
+            >
+            - Clean, responsive API docs.
+          </li>
+        </ul>
       </section>
       <section id="best-practices" tabindex="-1">
-        <h2>15. Best practices and standards</h2>
+        <h2>16. Best practices and standards</h2>
         <h3>Coding conventions</h3>
         <ul>
           <li>
@@ -673,62 +707,31 @@
       </section>
 
       <section id="deployment-ci-cd" tabindex="-1">
-        <h2>16. Deployment and CI/CD</h2>
-        <h3>Deployment platforms</h3>
+        <h2>17. Deployment and CI/CD</h2>
+        <h3>Frontend Deployment</h3>
         <ul>
-          <li>
-            Frontend hosted on Vercel, supporting instant CI/CD with GitHub
-            integration.
-          </li>
-          <li>
-            Backend deployed on Heroku with environment variables configured
-            securely.
-          </li>
+          <li><strong>Platform:</strong> Vercel</li>
+          <li><strong>Branch:</strong> Auto deployment from main</li>
+          <li><strong>Environment variables:</strong> Managed securely through .env in Vercel dashboard.</li>
+          <li><strong>Build & Preview:</strong> Each push triggers preview builds for PRs and deploys on merge to main.</li>
         </ul>
-        <h3>Environment configuration</h3>
+        <h3>Backend Deployment</h3>
         <ul>
-          <li>
-            Manage sensitive tokens and API keys securely via environment
-            variables.
-          </li>
+          <li><strong>Platform:</strong> Heroku</li>
+          <li><strong>Environment variables:</strong> Configured in Heroku dashboard</li>
         </ul>
+
+
         <h3>Automated pipelines</h3>
-        <ul>
-          <li>
-            Use GitHub Actions to run tests and build projects automatically on
-            push/PR.
-          </li>
-          <li>Deploy automatically on successful merges to main branches.</li>
-        </ul>
+       <ul>
+        <li><strong>Tool: </strong> GitHub Actions.</li>
+        <li><strong>Pre-Deployment:</strong> All codebases run tests, build and lint checks before deploying</li>
+        <li><strong>Automation:</strong> Automatic deployment on merge to main</li>
+        <li><strong>Status: </strong> Build and test status visible in PRs and repository dashboard</li>
+       </ul>
       </section>
 
-      <section id="api" tabindex="-1">
-        <h2>17. API documentation links</h2>
-        <p>
-          Access comprehensive and interactive API documentation to facilitate
-          integration and development:
-        </p>
-        <ul>
-          <li>
-            <a
-              href="https://fruitguard-3b97d3adfdf5.herokuapp.com/api/schema/swagger-ui/"
-              target="_blank"
-              rel="noopener"
-              >Swagger UI</a
-            >
-            - Interactive API explorer.
-          </li>
-          <li>
-            <a
-              href="https://fruitguard-3b97d3adfdf5.herokuapp.com/api/schema/redoc/"
-              target="_blank"
-              rel="noopener"
-              >ReDoc</a
-            >
-            - Clean, responsive API docs.
-          </li>
-        </ul>
-      </section>
+   
     </main>
 
     <footer class="footer">
