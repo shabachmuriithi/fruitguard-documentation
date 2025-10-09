@@ -62,4 +62,55 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.style.overflow = "auto";
     }
   });
+
+
+  const searchBar = document.getElementById("searchBar");
+  searchBar.addEventListener("input", () => {
+    const query = searchBar.value.toLowerCase().trim();
+
+    links.forEach((link) => {
+      const linkText = link.textContent.toLowerCase();
+      if (query === "" || linkText.includes(query)) {
+        link.classList.remove("hidden");
+      } else {
+        link.classList.add("hidden");
+      }
+    });
+
+  
+    if (query !== "") {
+      const matchingSection = Array.from(sections).find((section) => {
+        const sectionTitle = section.querySelector("h2")?.textContent.toLowerCase();
+        return sectionTitle?.includes(query);
+      });
+
+      if (matchingSection) {
+        matchingSection.scrollIntoView({ behavior: "smooth" });
+        
+        const sectionId = matchingSection.getAttribute("id");
+        links.forEach((link) => {
+          if (link.getAttribute("href").substring(1) === sectionId) {
+            link.classList.add("active");
+          } else {
+            link.classList.remove("active");
+          }
+        });
+      }
+    }
+  });
+
+  
+  searchBar.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      const query = searchBar.value.toLowerCase().trim();
+      const matchingSection = Array.from(sections).find((section) => {
+        const sectionTitle = section.querySelector("h2")?.textContent.toLowerCase();
+        return sectionTitle?.includes(query);
+      });
+
+      if (matchingSection) {
+        matchingSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  });
 });

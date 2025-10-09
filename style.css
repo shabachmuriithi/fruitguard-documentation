@@ -36,7 +36,20 @@ a {
   height: 120px;
   width: 100px;
 }
+.search-container {
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+}
+#searchBar {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  background-color: #fff7e6;
+  color: #683929;
 
+}
 .sidebar h2 {
   font-weight: 700;
   font-size: 1.4rem;

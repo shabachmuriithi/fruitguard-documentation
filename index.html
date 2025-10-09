@@ -11,10 +11,12 @@
     <link rel="stylesheet" href="style.css" />
     <script src="script.js"></script>
   </head>
+
   <body>
     <nav class="sidebar" aria-label="Main Documentation Navigation">
       <img src="images/fruitguardlogo.png" alt="logo" id="fruitguardlogo" />
       <h2 style="color: #ffc661">FruitGuard Documentation</h2>
+
       <a href="#overview" class="active">Overview</a>
       <a href="#gettingstarted">Getting Started</a>
       <a href="#systemflow">System Flow</a>
@@ -36,6 +38,14 @@
     </nav>
 
     <main role="main" class="main">
+      <div class="search-container">
+        <input
+          type="text"
+          id="searchBar"
+          placeholder="Search documentation..."
+          aria-label="Search documentation"
+        />
+      </div>
       <section id="overview" tabindex="-1">
         <h1 id="heading">FruitGuard Technical Documentation</h1>
         <h2>1. Overview</h2>
@@ -94,21 +104,36 @@
         <h3>Backend</h3>
         <ul>
           <li>
-            Clone repository: git clone
-            git@github.com:akirachix/fruitguard-backend.git
+            Clone repository:
+            <pre><code>git clone git@github.com:akirachix/fruitguard-backend.git</code></pre>
           </li>
-          <li>Install dependencies: uv pip install djangorestframework</li>
-          <li>Run migrations: python3 manage.py makemigrations</li>
-          <li>Run server: python3 manage.py runserver</li>
+          <li>
+            Install dependencies:
+            <pre><code>uv pip install djangorestframework</code></pre>
+          </li>
+          <li>
+            Run migrations:
+            <pre><code>python3 manage.py makemigrations</code></pre>
+          </li>
+          <li>
+            Run server:
+            <pre><code>python3 manage.py runserver</code></pre>
+          </li>
         </ul>
         <h3>Frontend</h3>
         <ul>
           <li>
-            Clone repository: git clone
-            git@github.com:akirachix/fruitguard-frontend.git
+            Clone repository:
+            <pre><code>git clone git@github.com:akirachix/fruitguard-frontend.git</code></pre>
           </li>
-          <li>Install dependencies: npm install</li>
-          <li>Run server: npm run dev</li>
+          <li>
+            Install dependencies:
+            <pre><code>npm install</code></pre>
+          </li>
+          <li>
+            Run server:
+            <pre><code>npm run dev</code></pre>
+          </li>
         </ul>
       </section>
 
