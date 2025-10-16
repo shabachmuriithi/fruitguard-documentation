@@ -22,16 +22,17 @@
       <a href="#systemflow">System Flow</a>
       <a href="#architecture">Architecture</a>
       <a href="#database">Database</a>
+      <a href="#api">API</a>
       <a href="#hardware">Hardware</a>
       <a href="#software">Software</a>
-      <a href="#communication">Communication</a>
+    
       <a href="#deployment">Deployment</a>
       <a href="#usage">Usage</a>
       <a href="#maintenance">Maintenance</a>
       <a href="#security">Security</a>
       <a href="#testing">Testing & Monitoring</a>
       <a href="#future">Future</a>
-      <a href="#api">API</a>
+      
       <a href="#best-practices">Best Practices & Standards</a>
       <a href="#deployment-ci-cd">Deployment & CI/CD</a>
     </nav>
@@ -257,334 +258,8 @@
         />
       </section>
 
-      <section id="hardware" tabindex="-1">
-        <h2>6. Hardware details</h2>
-        <p>Each FruitGuard device consists of:</p>
-        <h3>Hardware Components</h3>
-        <ul>
-          <li>
-             <strong>ESP32 MCU:</strong> </li>
-             <p> Dual-core MCU, featuring integrated Wi-Fi and Bluetooth capabilities. It serves as the central processing unit for the FruitGuard device.<br>
-                 Handles data acquisition from sensors, processes measurements, and manages communication with external systems</p>
-          <li>
-            <strong>Ultrasonic Sensor (HC-SR04):</strong> 
-          </li>
-          <p> A low-cost ultrasonic sensor capable of measuring distances from 2 cm to 4 meters with an accuracy of ±2 mm <br>
-            Calculates the distance to the fill level inside a fruit fly trap.<br> The sensor uses a trigger pin to initiate measurement and an echo pin to return the result.</p>
-          <li>
-            <strong>Power Supply:</strong> 
-          </li>
-          <p>Rechargeable battery and solar panel
-            working together with voltage regulation to provide sustainable,
-            reliable power.</p>
-          <li>
-            <strong>Wiring & Enclosure:</strong> 
-          </li>
-          <p>Protects the system from environmental hazards and ensures reliable operation by maintaining robust electrical connections</p>
-          <li><strong>LoRa module:</strong></li>
-          <p>A low-power, long-range radio module <br>
-            Enables long-distance, low-bandwidth communication for transmitting sensor data to a central gateway </p>
-        </ul>
-        <h3>Wiring connections:</h3>
-        <ul>
-          <li> <strong>VCC - 5V</strong></li>
-          <p>The HC-SR04 VCC pin is connected to a 5V power source from the ESP32 providing the necessary power for the sensor</p>
-          <li><strong>GND - ESP32 ground</strong></li>
-          <p>The sensor’s ground pin is connected to the ESP32’s ground pin to complete the electrical circuit</p>
-          <li><strong>Trig - GPIO5</strong></li>
-          <p> The trigger pin of the HC-SR04 is connected to GPIO5 on the ESP32. The ESP32 sends a short pulse to this pin to initiate an ultrasonic measurement</p>
-          <li><strong>Echo - GPIO18</strong></li>
-          <p> The echo pin is connected to GPIO18 on the ESP32. This pin outputs a pulse whose duration corresponds to the time taken for the ultrasonic wave to return, which the ESP32 uses to calculate distance</p>
-        </ul>
-        <h3>Power management strategy:</h3>
-        <p>
-          Firmware leverages deep sleep cycles between sensor readings to
-          maximize battery life, waking periodically to take measurements and
-          transmit data.
-        </p>
-      </section>
-
-      <section id="software" tabindex="-1">
-        <h2>7. Software design</h2>
-        <h3>ESP32 firmware flow</h3>
-        <p>The firmware continuously:</p>
-        <ol>
-          <li>Initializes sensors and network connection.</li>
-          <li>Measures ultrasonic echo time to derive distance.</li>
-          <li>
-            Constructs a JSON payload with sensor data and metadata (battery
-            voltage, timestamp, device ID).
-          </li>
-          <li>
-            Connects securely to MQTT broker over TLS to publish telemetry.
-          </li>
-          <li>Enters low-power sleep until the next measurement cycle.</li>
-          <li>Handles disconnection/retries with exponential backoff.</li>
-        </ol>
-        <pre><code>// Simplified sensor read snippet
-    long duration = pulseIn(echoPin, HIGH);
-    float distance = (duration / 2.0) * 0.0343; // cm
-    </code></pre>
-        <h3>Backend API</h3>
-        <p>Implemented with Django REST Framework:</p>
-        <ul>
-          <li>Secured endpoints using JWT authentication.</li>
-          <li>Telemetry route validates and stores incoming JSON data.</li>
-          <li>Threshold checks trigger Celery tasks to send SMS alerts.</li>
-          <li>Device registration and metadata management endpoints.</li>
-        </ul>
-        <pre><code>CREATE TABLE devices (
-        device_id VARCHAR PRIMARY KEY,
-        device_identifier VARCHAR,
-        status VARCHAR,
-        user_id VARCHAR REFERENCES users(users_id),
-        created_at TIMESTAMP,
-        updated_at TIMESTAMP
-        );
-
-        CREATE TABLE data_monitoring (
-        device_no VARCHAR REFERENCES devices(device_id),
-        trap_fill_level INT,
-        timestamp TIMESTAMP,
-        updated_at TIMESTAMP,
-        created_at TIMESTAMP
-        );
-    </code></pre>
-        <h3>SMS Alert integration</h3>
-        <p>SMS Leopard REST API client supports:</p>
-        <ul>
-          <li>Basic Auth with Base64 encoded keys.</li>
-          <li>Retry with exponential backoff on failures.</li>
-          <li>Logging and alert history maintenance.</li>
-        </ul>
-        <h3>Frontend application</h3>
-        <p>Developed in React/Next.js:</p>
-        <ul>
-          <li>Responsive dashboard visualizing trap metrics.</li>
-          <li>Role-based access control for users and admins.</li>
-          <li>Real-time data update logic with polling(future).</li>
-        </ul>
-      </section>
-
-      <section id="communication" tabindex="-1">
-        <h2>8. Communication protocols</h2>
-        <h3>MQTT Topics & Quality-of-Service</h3>
-        <p>Standardized topic format:</p>
-        <code>fruitguard/devices/{device_id}/telemetry</code>
-        <p>QoS level 1 ensures message delivery without duplicates.</p>
-        <h3>Payload JSON Schema</h3>
-        <pre><code>{
-        "device_id": "FG123456",
-        "timestamp": "2025-10-01T12:45:00Z",
-        "distance_cm": 15.5,
-        }
-    </code></pre>
-        <h3>REST API endpoint</h3>
-        <ul>
-          <li>
-            <code>POST /api/telemetry/</code> - accepts telemetry JSON with JWT
-            Bearer token
-          </li>
-          <li>Returns 200 OK on success, descriptive error codes on failure</li>
-        </ul>
-        <h3>Security considerations</h3>
-        <ul>
-          <li>
-            All communications secured with TLS (MQTT on port 8883, REST via
-            HTTPS)
-          </li>
-          <li>
-            Environment variables used to store secrets and rotate keys
-            regularly
-          </li>
-          <li>Use of JWT tokens for stateless API authentication</li>
-        </ul>
-      </section>
-
-      <section id="deployment" tabindex="-1">
-        <h2>9. Installation & Deployment</h2>
-        <h3>Hardware setup</h3>
-        <ol>
-          <li>Assemble ESP32 and sensors securely in enclosure.</li>
-          <li>Connect regulated power supply and battery.</li>
-          <li>
-            Set sensor sensitivity and limits according to the specific design
-            of the trap.
-          </li>
-        </ol>
-        <h3>Firmware production</h3>
-        <ol>
-          <li>Set MQTT credentials and broker URL in source.</li>
-          <li>Flash ESP32 using Arduino IDE.</li>
-          <li>Test connectivity and telemetry transmission.</li>
-        </ol>
-        <h3>Backend deployment</h3>
-        <ol>
-          <li>Configure environment variables for DB, MQTT, SMS keys.</li>
-          <li>Run Django migrations and start API with Gunicorn.</li>
-          <li>Deploy backend on cloud platforms (Heroku) with HTTPS.</li>
-        </ol>
-        <h3>Frontend deployment</h3>
-        <ol>
-          <li>Build the React app using <code>npm run build</code>.</li>
-          <li>
-            Deploy static files on Vercel, Netlify, or CDN-enabled hosting.
-          </li>
-          <li>Configure frontend env variables to point to backend APIs.</li>
-        </ol>
-      </section>
-
-      <section id="usage" tabindex="-1">
-        <h2>10. Usage guide</h2>
-        <p>
-          <strong>Farmers:</strong> Monitor traps and receive SMS maintenance
-          alerts to take action timely.
-        </p>
-        <p>
-          <strong>Administrators:</strong> Manage users(agrovet and admin) and
-          devices, verify system health, analyze aggregated data, and apply
-          configuration changes.
-        </p>
-        <h3>Dashboard capabilities</h3>
-        <ul>
-          <li>
-            Dashboard cards display key metrics: number of active agrovet users
-            and active traps.
-          </li>
-          <li>
-            Profile section allows users to view and edit their personal
-            information.
-          </li>
-          <li>
-            Real-time trap status overview with alerts and notifications for
-            action.
-          </li>
-        </ul>
-      </section>
-
-      <section id="maintenance" tabindex="-1">
-        <h2>11. Maintenance & Troubleshooting</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Issue</th>
-              <th>Cause</th>
-              <th>Recommended fix</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>MQTT fails to connect</td>
-              <td>Incorrect credentials, network failure</td>
-              <td>Check MQTT settings, restart device, verify connectivity</td>
-            </tr>
-            <tr>
-              <td>Sensor readings always 0</td>
-              <td>Hardware fault or wiring issue</td>
-              <td>Inspect sensor wiring, replace sensor if defective</td>
-            </tr>
-            <tr>
-              <td>No SMS alerts</td>
-              <td>Invalid API key or message formatting error</td>
-              <td>
-                Validate API credentials, verify message formats and phone
-                numbers
-              </td>
-            </tr>
-            <tr>
-              <td>API 401 Unauthorized</td>
-              <td>Expired or missing JWT token</td>
-              <td>Refresh token or reauthenticate client</td>
-            </tr>
-            <tr>
-              <td>Dashboard data delayed</td>
-              <td>Backend or frontend sync issues</td>
-              <td>
-                Restart backend services, refresh frontend, check network logs
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <h3>Recommended maintenance</h3>
-        <ul>
-          <li>
-            Checking and adjusting the sensor regularly to make sure it gives
-            correct and accurate measurements."
-          </li>
-          <li>Periodic firmware updates.</li>
-          <li>Monitor logs and alert history for anomalies.</li>
-          <li>Backup device and user data periodically.</li>
-        </ul>
-      </section>
-
-      <section id="security" tabindex="-1">
-        <h2>12. Security considerations</h2>
-        <ul>
-          <li>
-            <strong>Authentication: </strong>JWT-based token authentication for
-            APIs and devices.
-          </li>
-          <li>
-            <strong>Encryption: </strong>TLS 1.2+ for MQTT and HTTPS for all web
-            requests.
-          </li>
-          <li>
-            <strong>Access Control: </strong>Role-based permissions for farmers,
-            admins, and devices.
-          </li>
-          <li>
-            <strong>Input Validation: </strong>Strict server-side input
-            sanitization to prevent injection attacks.
-          </li>
-          <li>
-            <strong>Audit Logging: </strong>All access and error logs recorded
-            for security audit.
-          </li>
-        </ul>
-      </section>
-
-      <section id="testing" tabindex="-1">
-        <h2>13. Testing and monitoring</h2>
-        <ul>
-          <li>
-            Unit tests covering backend API, firmware sensor logic, and frontend
-            components.
-          </li>
-          <li>
-            Integration tests with simulated MQTT data streams and API
-            workflows.
-          </li>
-          <li>
-            Monitoring tools for system health, Sentry for error tracking.
-          </li>
-          <li>
-            Success metrics tracking include uptime, data completeness, and
-            alert delivery.
-          </li>
-          <li>Postman collections automate API contract testing.</li>
-        </ul>
-      </section>
-
-      <section id="future" tabindex="-1">
-        <h2>14. Future enhancements</h2>
-        <ul>
-          <li>
-            <strong>Predictive analytics:</strong> AI-driven trap fill trend
-            prediction.
-          </li>
-          <li>
-            <strong>LoRaWAN:</strong> IoT network expansion for wide-area
-            deployments.
-          </li>
-          <li>
-            <strong>Additional sensors:</strong> Environmental sensors for
-            humidity, temperature.
-          </li>
-        </ul>
-      </section>
-
-      <section id="api" tabindex="-1">
-        <h2>15. API</h2>
+          <section id="api" tabindex="-1">
+        <h2>6. API</h2>
 
         <h3>Data Monitoring API</h3>
         <p>
@@ -667,6 +342,375 @@
           </li>
         </ul>
       </section>
+
+      <section id="hardware" tabindex="-1">
+        <h2>7. Hardware details</h2>
+        <p>Each FruitGuard device consists of:</p>
+        <h3>Hardware Components</h3>
+        <ul>
+          <li>
+             <strong>ESP32 MCU:</strong> </li>
+             <p> Dual-core MCU, featuring integrated Wi-Fi and Bluetooth capabilities. It serves as the central processing unit for the FruitGuard device.<br>
+                 Handles data acquisition from sensors, processes measurements, and manages communication with external systems</p>
+          <li>
+            <strong>Ultrasonic Sensor (HC-SR04):</strong> 
+          </li>
+          <p> A low-cost ultrasonic sensor capable of measuring distances from 2 cm to 4 meters with an accuracy of ±2 mm <br>
+            Calculates the distance to the fill level inside a fruit fly trap.<br> The sensor uses a trigger pin to initiate measurement and an echo pin to return the result.</p>
+          <li>
+            <strong>Power Supply:</strong> 
+          </li>
+          <p>Rechargeable battery and solar panel
+            working together with voltage regulation to provide sustainable,
+            reliable power.</p>
+          <li>
+            <strong>Wiring & Enclosure:</strong> 
+          </li>
+          <p>Protects the system from environmental hazards and ensures reliable operation by maintaining robust electrical connections</p>
+          <li><strong>LoRa module:</strong></li>
+          <p>A low-power, long-range radio module <br>
+            Enables long-distance, low-bandwidth communication for transmitting sensor data to a central gateway </p>
+        </ul>
+        <h3>Wiring connections:</h3>
+        <ul>
+          <li> <strong>VCC - 5V</strong></li>
+          <p>The HC-SR04 VCC pin is connected to a 5V power source from the ESP32 providing the necessary power for the sensor</p>
+          <li><strong>GND - ESP32 ground</strong></li>
+          <p>The sensor’s ground pin is connected to the ESP32’s ground pin to complete the electrical circuit</p>
+          <li><strong>Trig - GPIO5</strong></li>
+          <p> The trigger pin of the HC-SR04 is connected to GPIO5 on the ESP32. The ESP32 sends a short pulse to this pin to initiate an ultrasonic measurement</p>
+          <li><strong>Echo - GPIO18</strong></li>
+          <p> The echo pin is connected to GPIO18 on the ESP32. This pin outputs a pulse whose duration corresponds to the time taken for the ultrasonic wave to return, which the ESP32 uses to calculate distance</p>
+        </ul>
+        <h3>Power management strategy:</h3>
+        <p>
+          Firmware leverages deep sleep cycles between sensor readings to
+          maximize battery life, waking periodically to take measurements and
+          transmit data.
+        </p>
+      </section>
+
+      <section id="software" tabindex="-1">
+        <h2>8. Software design</h2>
+        <h3>ESP32 firmware flow</h3>
+        <p>The firmware continuously:</p>
+        <ol>
+          <li>Initializes sensors and network connection.</li>
+          <li>Measures ultrasonic echo time to derive distance.</li>
+          <li>
+            Constructs a JSON payload with sensor data and metadata (battery
+            voltage, timestamp, device ID).
+          </li>
+          <li>
+            Connects securely to MQTT broker over TLS to publish telemetry.
+          </li>
+          <li>Enters low-power sleep until the next measurement cycle.</li>
+          <li>Handles disconnection/retries with exponential backoff.</li>
+        </ol>
+        <pre><code>// Simplified sensor read snippet
+    long duration = pulseIn(echoPin, HIGH);
+    float distance = (duration / 2.0) * 0.0343; // cm
+    </code></pre>
+        <h3>Backend API</h3>
+        <p>Implemented with Django REST Framework:</p>
+        <ul>
+          <li>Secured endpoints using JWT authentication.</li>
+          <li>Telemetry route validates and stores incoming JSON data.</li>
+          <li>Threshold checks trigger Celery tasks to send SMS alerts.</li>
+          <li>Device registration and metadata management endpoints.</li>
+        </ul>
+        <pre><code>CREATE TABLE devices (
+        device_id VARCHAR PRIMARY KEY,
+        device_identifier VARCHAR,
+        status VARCHAR,
+        user_id VARCHAR REFERENCES users(users_id),
+        created_at TIMESTAMP,
+        updated_at TIMESTAMP
+        );
+
+        CREATE TABLE data_monitoring (
+        device_no VARCHAR REFERENCES devices(device_id),
+        trap_fill_level INT,
+        timestamp TIMESTAMP,
+        updated_at TIMESTAMP,
+        created_at TIMESTAMP
+        );
+    </code></pre>
+        <h3>SMS Alert integration</h3>
+        <p>SMS Leopard REST API client supports:</p>
+        <ul>
+          <li>Basic Auth with Base64 encoded keys.</li>
+          <li>Retry with exponential backoff on failures.</li>
+          <li>Logging and alert history maintenance.</li>
+        </ul>
+        <h3>Frontend application</h3>
+        <p>Developed in React/Next.js:</p>
+        <ul>
+          <li>Responsive dashboard visualizing trap metrics.</li>
+          <li>Role-based access control for users and admins.</li>
+          <li>Real-time data update logic with polling(future).</li>
+        </ul>
+
+
+
+        <h2>Communication protocols</h2>
+        <h3>MQTT Topics & Quality-of-Service</h3>
+        <p>Standardized topic format:</p>
+        <code>fruitguard/devices/{device_id}/telemetry</code>
+        <p>QoS level 1 ensures message delivery without duplicates.</p>
+        <h3>Payload JSON Schema</h3>
+        <pre><code>{
+        "device_id": "FG123456",
+        "timestamp": "2025-10-01T12:45:00Z",
+        "distance_cm": 15.5,
+        }
+    </code></pre>
+        <h3>REST API endpoint</h3>
+        <ul>
+          <li>
+            <code>POST /api/telemetry/</code> - accepts telemetry JSON with JWT
+            Bearer token
+          </li>
+          <li>Returns 200 OK on success, descriptive error codes on failure</li>
+        </ul>
+        <h3>Security considerations</h3>
+        <ul>
+          <li>
+            All communications secured with TLS (MQTT on port 8883, REST via
+            HTTPS)
+          </li>
+          <li>
+            Environment variables used to store secrets and rotate keys
+            regularly
+          </li>
+          <li>Use of JWT tokens for stateless API authentication</li>
+        </ul>
+    
+
+
+
+
+
+      </section>
+
+      <section id="communication" tabindex="-1">
+        <h2>9. Communication protocols</h2>
+        <h3>MQTT Topics & Quality-of-Service</h3>
+        <p>Standardized topic format:</p>
+        <code>fruitguard/devices/{device_id}/telemetry</code>
+        <p>QoS level 1 ensures message delivery without duplicates.</p>
+        <h3>Payload JSON Schema</h3>
+        <pre><code>{
+        "device_id": "FG123456",
+        "timestamp": "2025-10-01T12:45:00Z",
+        "distance_cm": 15.5,
+        }
+    </code></pre>
+        <h3>REST API endpoint</h3>
+        <ul>
+          <li>
+            <code>POST /api/telemetry/</code> - accepts telemetry JSON with JWT
+            Bearer token
+          </li>
+          <li>Returns 200 OK on success, descriptive error codes on failure</li>
+        </ul>
+        <h3>Security considerations</h3>
+        <ul>
+          <li>
+            All communications secured with TLS (MQTT on port 8883, REST via
+            HTTPS)
+          </li>
+          <li>
+            Environment variables used to store secrets and rotate keys
+            regularly
+          </li>
+          <li>Use of JWT tokens for stateless API authentication</li>
+        </ul>
+      </section>
+
+      <section id="deployment" tabindex="-1">
+        <h2>10. Installation & Deployment</h2>
+        <h3>Hardware setup</h3>
+        <ol>
+          <li>Assemble ESP32 and sensors securely in enclosure.</li>
+          <li>Connect regulated power supply and battery.</li>
+          <li>
+            Set sensor sensitivity and limits according to the specific design
+            of the trap.
+          </li>
+        </ol>
+        <h3>Firmware production</h3>
+        <ol>
+          <li>Set MQTT credentials and broker URL in source.</li>
+          <li>Flash ESP32 using Arduino IDE.</li>
+          <li>Test connectivity and telemetry transmission.</li>
+        </ol>
+        <h3>Backend deployment</h3>
+        <ol>
+          <li>Configure environment variables for DB, MQTT, SMS keys.</li>
+          <li>Run Django migrations and start API with Gunicorn.</li>
+          <li>Deploy backend on cloud platforms (Heroku) with HTTPS.</li>
+        </ol>
+        <h3>Frontend deployment</h3>
+        <ol>
+          <li>Build the React app using <code>npm run build</code>.</li>
+          <li>
+            Deploy static files on Vercel, Netlify, or CDN-enabled hosting.
+          </li>
+          <li>Configure frontend env variables to point to backend APIs.</li>
+        </ol>
+      </section>
+
+      <section id="usage" tabindex="-1">
+        <h2>11. Usage guide</h2>
+        <p>
+          <strong>Farmers:</strong> Monitor traps and receive SMS maintenance
+          alerts to take action timely.
+        </p>
+        <p>
+          <strong>Administrators:</strong> Manage users(agrovet and admin) and
+          devices, verify system health, analyze aggregated data, and apply
+          configuration changes.
+        </p>
+        <h3>Dashboard capabilities</h3>
+        <ul>
+          <li>
+            Dashboard cards display key metrics: number of active agrovet users
+            and active traps.
+          </li>
+          <li>
+            Profile section allows users to view and edit their personal
+            information.
+          </li>
+          <li>
+            Real-time trap status overview with alerts and notifications for
+            action.
+          </li>
+        </ul>
+      </section>
+
+      <section id="maintenance" tabindex="-1">
+        <h2>12. Maintenance & Troubleshooting</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Issue</th>
+              <th>Cause</th>
+              <th>Recommended fix</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>MQTT fails to connect</td>
+              <td>Incorrect credentials, network failure</td>
+              <td>Check MQTT settings, restart device, verify connectivity</td>
+            </tr>
+            <tr>
+              <td>Sensor readings always 0</td>
+              <td>Hardware fault or wiring issue</td>
+              <td>Inspect sensor wiring, replace sensor if defective</td>
+            </tr>
+            <tr>
+              <td>No SMS alerts</td>
+              <td>Invalid API key or message formatting error</td>
+              <td>
+                Validate API credentials, verify message formats and phone
+                numbers
+              </td>
+            </tr>
+            <tr>
+              <td>API 401 Unauthorized</td>
+              <td>Expired or missing JWT token</td>
+              <td>Refresh token or reauthenticate client</td>
+            </tr>
+            <tr>
+              <td>Dashboard data delayed</td>
+              <td>Backend or frontend sync issues</td>
+              <td>
+                Restart backend services, refresh frontend, check network logs
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Recommended maintenance</h3>
+        <ul>
+          <li>
+            Checking and adjusting the sensor regularly to make sure it gives
+            correct and accurate measurements."
+          </li>
+          <li>Periodic firmware updates.</li>
+          <li>Monitor logs and alert history for anomalies.</li>
+          <li>Backup device and user data periodically.</li>
+        </ul>
+      </section>
+
+      <section id="security" tabindex="-1">
+        <h2>13. Security considerations</h2>
+        <ul>
+          <li>
+            <strong>Authentication: </strong>JWT-based token authentication for
+            APIs and devices.
+          </li>
+          <li>
+            <strong>Encryption: </strong>TLS 1.2+ for MQTT and HTTPS for all web
+            requests.
+          </li>
+          <li>
+            <strong>Access Control: </strong>Role-based permissions for farmers,
+            admins, and devices.
+          </li>
+          <li>
+            <strong>Input Validation: </strong>Strict server-side input
+            sanitization to prevent injection attacks.
+          </li>
+          <li>
+            <strong>Audit Logging: </strong>All access and error logs recorded
+            for security audit.
+          </li>
+        </ul>
+      </section>
+
+      <section id="testing" tabindex="-1">
+        <h2>14. Testing and monitoring</h2>
+        <ul>
+          <li>
+            Unit tests covering backend API, firmware sensor logic, and frontend
+            components.
+          </li>
+          <li>
+            Integration tests with simulated MQTT data streams and API
+            workflows.
+          </li>
+          <li>
+            Monitoring tools for system health, Sentry for error tracking.
+          </li>
+          <li>
+            Success metrics tracking include uptime, data completeness, and
+            alert delivery.
+          </li>
+          <li>Postman collections automate API contract testing.</li>
+        </ul>
+      </section>
+
+      <section id="future" tabindex="-1">
+        <h2>15. Future enhancements</h2>
+        <ul>
+          <li>
+            <strong>Predictive analytics:</strong> AI-driven trap fill trend
+            prediction.
+          </li>
+          <li>
+            <strong>LoRaWAN:</strong> IoT network expansion for wide-area
+            deployments.
+          </li>
+          <li>
+            <strong>Additional sensors:</strong> Environmental sensors for
+            humidity, temperature.
+          </li>
+        </ul>
+      </section>
+
+  
       <section id="best-practices" tabindex="-1">
         <h2>16. Best practices and standards</h2>
         <h3>Coding conventions</h3>
